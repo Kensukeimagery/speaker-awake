@@ -28,7 +28,8 @@ It lives in your system tray and plays a tiny signal at a chosen interval, so th
 - **Fine-tune everything** – frequency, level (dB), pulse length, repeat interval, fade, per mode
 - **Pick the output device** – target just your speakers
 - **Schedule** – only run during chosen hours (overnight ranges work)
-- **Starts with Windows**, hidden in the tray
+- **Smart pause** – stands down while music or a call is playing and resumes when it's quiet again (optional)
+- **Starts with Windows** – quietly in the background or with the window open, your choice (optional)
 - **Thai / English interface**
 - Free, open source, no account, no network access, no telemetry
 
@@ -86,6 +87,8 @@ Help fill this in with a [speaker report](https://github.com/Kensukeimagery/spea
 
 **Does it work with Bluetooth / USB / HDMI speakers?** Any output Windows can play to. Pick it under *Output device*. Devices that sleep inside the digital link (some HDMI monitors) may behave differently, so please report results.
 
+**What does "Pause while other audio plays" listen to?** The sound Windows is playing to the default output device (a loopback of the mix, never the microphone). The level is only measured on your PC; nothing is recorded or sent. It isn't available in *Always on* mode, where the app's own signal can't be told apart from other audio.
+
 **Does it stop the PC from sleeping?** No. It only keeps the *speakers* awake.
 
 **Is it safe?** Source code is here, MIT licensed. The app makes no network connections; the GitHub button just opens your browser.
@@ -140,7 +143,8 @@ Speaker reports are the most useful contribution – see [CONTRIBUTING.md](CONTR
 - **ปรับละเอียดได้ทุกอย่าง** – ความถี่ ระดับเสียง (dB) ความยาว ช่วงส่งซ้ำ การเฟด แยกตามโหมด
 - **เลือกอุปกรณ์เล่นเสียง** ให้ตรงกับลำโพง
 - **ตั้งเวลา** ทำงานเฉพาะบางช่วง (ข้ามคืนได้)
-- **เริ่มพร้อม Windows** แบบซ่อนไว้ที่ถาดระบบ
+- **พักอัตโนมัติเมื่อมีเสียงเล่นอยู่** – หยุดส่งสัญญาณตอนเปิดเพลงหรือคุยสาย แล้วกลับมาเองเมื่อเงียบ (ตัวเลือก)
+- **เปิดเองหลังเปิดเครื่อง** – เลือกได้ว่าให้ทำงานเบื้องหลังเงียบๆ หรือเด้งหน้าต่างขึ้นมา (ตัวเลือก)
 - หน้าต่างภาษาไทย/อังกฤษ
 - ฟรี โอเพนซอร์ส ไม่ต้องสมัครบัญชี ไม่เชื่อมต่ออินเทอร์เน็ต ไม่เก็บข้อมูล
 
@@ -183,6 +187,8 @@ Speaker reports are the most useful contribution – see [CONTRIBUTING.md](CONTR
 **กินไฟหรือ CPU มากไหม?** ไม่มาก โหมดเปิดตลอดจะกินไฟมากขึ้นเล็กน้อย
 
 **ใช้กับลำโพง USB / Bluetooth / HDMI ได้ไหม?** ได้กับเอาต์พุตที่ Windows เล่นเสียงออกได้ เลือกใน "อุปกรณ์เล่นเสียง" ถ้าใช้ได้หรือไม่ได้ บอกเราผ่าน[แบบฟอร์มรายงานลำโพง](https://github.com/Kensukeimagery/speaker-awake/issues/new?template=speaker-report.yml)
+
+**"พักอัตโนมัติเมื่อมีเสียงเล่นอยู่" ฟังอะไร?** ฟังเสียงที่ Windows เล่นออกอุปกรณ์เริ่มต้น (ไม่ใช่ไมโครโฟน) วัดระดับในเครื่องเท่านั้น ไม่อัดเสียงและไม่ส่งไปที่ไหน ใช้ไม่ได้ในโหมด *เปิดตลอด* เพราะแยกสัญญาณของโปรแกรมออกจากเสียงอื่นไม่ได้
 
 **ทำให้คอมไม่หลับด้วยไหม?** ไม่ กันเฉพาะ *ลำโพง* ไม่ให้หลับ
 

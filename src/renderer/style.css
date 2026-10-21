@@ -34,9 +34,8 @@ body {
 .titlebar button { -webkit-app-region: no-drag; }
 .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; letter-spacing: .2px; }
 .logo {
-  width: 18px; height: 18px; border-radius: 6px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  box-shadow: 0 0 12px #36d6b566;
+  width: 22px; height: 22px; border-radius: 6px;
+  background: url("logo.png") center / cover no-repeat;
 }
 
 main { max-width: 520px; margin: 0 auto; padding: 4px 18px 28px; display: grid; gap: 16px; }
@@ -150,3 +149,15 @@ input[type="range"]:focus-visible { outline: 2px solid var(--accent-2); outline-
 footer { display: flex; align-items: center; gap: 6px; }
 .grow { flex: 1; }
 [hidden] { display: none !important; }
+
+.seg-wrap { padding: 2px 0 10px; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; }
+.seg button { font: inherit; font-size: 13px; color: var(--muted); background: transparent; border: 0; border-radius: 9px; padding: 7px 8px; cursor: pointer; }
+.seg button[aria-checked="true"] { background: var(--accent); color: #04120e; font-weight: 600; }
+.seg button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+.smart { padding: 4px 0 8px; border-top: 1px solid var(--line); }
+.meter { position: relative; height: 8px; border-radius: 99px; background: var(--line); margin-top: 12px; overflow: hidden; }
+#meterFill { position: absolute; inset: 0 auto 0 0; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .15s; }
+#meterMark { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--warn); left: 0; }
+.meter.hot #meterFill { background: var(--warn); }
+.meter-info { display: flex; justify-content: space-between; font-size: 12px; margin-top: 4px; }

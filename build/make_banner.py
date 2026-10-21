@@ -15,6 +15,7 @@ def font(name, size): return ImageFont.truetype(F + name, size)
 
 icon = Image.open(os.path.join(ROOT, "build", "icon.png")).convert("RGBA").resize((96, 96), Image.LANCZOS)
 bg.paste(icon, (80, 110), icon)
+d.rounded_rectangle([80, 110, 175, 205], 22, outline=(70, 82, 112), width=2)
 d.text((196, 120), "Speaker Awake", font=font("segoeuib.ttf", 64), fill=(232, 234, 242))
 d.text((80, 250), "Stop your speakers from falling asleep.", font=font("segoeuib.ttf", 34), fill=(54, 214, 181))
 d.text((80, 300), "Never miss the first ring of a call again.", font=font("segoeui.ttf", 30), fill=(180, 186, 205))

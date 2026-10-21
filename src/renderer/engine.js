@@ -31,7 +31,13 @@
       this.cache = new Map();
       this.timer = null;
       this.active = false;
+      this.paused = false;      // auto-paused because something else is playing
+      this.ownUntil = 0;        // our own audio is audible in loopback until this time
       this.error = '';
+      this.monitor = new root.SystemAudioMonitor((level) => { this.level = level; });
+      this.monitor.isMasked = (now) => now < this.ownUntil;
+      this.level = -Infinity;
+      this.smartError = '';
       navigator.mediaDevices.addEventListener('devicechange', () => this.applySink());
     }
 
@@ -82,6 +88,7 @@
       src.buffer = buf;
       src.connect(this.ctx.destination);
       src.start();
+      this.ownUntil = Date.now() + buf.duration * 1000 + 600;
       return buf.duration;
     }
 
@@ -111,6 +118,9 @@
       this.onUpdate({
         running: this.running,
         active: this.active,
+        paused: this.paused,
+        level: this.level,
+        smartError: this.smartError,
         nextAt: this.nextAt,
         lastAt: this.lastAt,
         pulses: this.pulses,
@@ -130,10 +140,28 @@
         const p = this.cfg.params;
         const continuous = !(p.intervalSec > 0);
 
-        if (!active) {
+        // Smart pause: stand down while other audio is playing. Not possible in continuous
+        // mode, where our own signal is always in the mix and can't be told apart from theirs.
+        const smart = this.cfg.smart;
+        const smartOn = !!(smart && smart.enabled && !continuous && active);
+        if (smartOn) {
+          this.monitor.configure({ thresholdDb: smart.thresholdDb, resumeSec: smart.resumeSec });
+          if (!this.monitor.listening && now - (this.lastStartTry || 0) > 15000) {
+            this.lastStartTry = now;
+            this.monitor.start().then((ok) => { this.smartError = ok ? '' : this.monitor.error || 'failed'; });
+          }
+        } else if (this.monitor.listening) {
+          this.monitor.stop();
+          this.level = -Infinity;
+        }
+        const paused = smartOn && this.monitor.listening && this.monitor.busy(now);
+        if (paused !== this.paused) this.nextAt = 0; // on resume, fire a pulse right away
+        this.paused = paused;
+
+        if (!active || paused) {
           this.stopLoop();
-          this.active = false;
-          this.nextAt = 0;
+          this.active = active;
+          if (!active) this.nextAt = 0;
         } else if (continuous) {
           this.startLoop(p);
           this.active = true;
@@ -159,6 +187,7 @@
       this.cfg = cfg;
       this.running = true;
       this.active = false;
+      this.paused = false;
       this.nextAt = 0;
       await this.ensureContext();
       await this.applySink();
@@ -170,6 +199,9 @@
     stop() {
       this.running = false;
       this.active = false;
+      this.paused = false;
+      this.monitor.stop();
+      this.level = -Infinity;
       this.nextAt = 0;
       clearInterval(this.timer);
       this.stopLoop();

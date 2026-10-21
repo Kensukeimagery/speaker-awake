@@ -9,8 +9,10 @@
     params: {}, // per-mode overrides: { [modeId]: {...} }
     running: true,
     deviceId: 'default',
-    autoStart: true,
+    autoStart: false,
+    startMode: 'tray', // how to start with Windows: 'tray' (hidden) or 'window'
     schedule: { enabled: false, from: '22:00', to: '07:00' },
+    smart: { enabled: false, thresholdDb: -55, resumeSec: 15 },
   };
 
   let S = JSON.parse(JSON.stringify(DEFAULTS));
@@ -26,7 +28,7 @@
     return Object.assign({}, modeById(S.mode).params, S.params[S.mode] || {});
   }
   function config() {
-    return { params: currentParams(), deviceId: S.deviceId, schedule: S.schedule };
+    return { params: currentParams(), deviceId: S.deviceId, schedule: S.schedule, smart: S.smart };
   }
   function save() {
     clearTimeout(saveTimer);
@@ -40,10 +42,16 @@
     if (typeof raw.running === 'boolean') out.running = raw.running;
     if (typeof raw.deviceId === 'string') out.deviceId = raw.deviceId;
     if (typeof raw.autoStart === 'boolean') out.autoStart = raw.autoStart;
+    if (raw.startMode === 'tray' || raw.startMode === 'window') out.startMode = raw.startMode;
     if (raw.schedule && typeof raw.schedule === 'object') {
       out.schedule.enabled = !!raw.schedule.enabled;
       if (/^\d{2}:\d{2}$/.test(raw.schedule.from)) out.schedule.from = raw.schedule.from;
       if (/^\d{2}:\d{2}$/.test(raw.schedule.to)) out.schedule.to = raw.schedule.to;
+    }
+    if (raw.smart && typeof raw.smart === 'object') {
+      out.smart.enabled = !!raw.smart.enabled;
+      if (Number.isFinite(raw.smart.thresholdDb)) out.smart.thresholdDb = Math.min(-20, Math.max(-80, raw.smart.thresholdDb));
+      if (Number.isFinite(raw.smart.resumeSec)) out.smart.resumeSec = Math.min(120, Math.max(3, raw.smart.resumeSec));
     }
     if (raw.params && typeof raw.params === 'object') {
       for (const m of MODES) {
@@ -105,6 +113,15 @@
     $('autoStartSub').textContent = info.packaged ? x.autoStartSub : x.autoStartDev;
     $('schedLbl').textContent = x.schedule;
     $('schedSub').textContent = x.scheduleSub;
+    $('startTray').textContent = x.startTray;
+    $('startWindow').textContent = x.startWindow;
+    renderStartMode();
+    $('smartLbl').textContent = x.smart;
+    $('lblThr').textContent = x.thr;
+    $('lblResume').textContent = x.resume;
+    $('meterLbl').textContent = x.meterLbl;
+    $('smartNote').textContent = x.smartNote;
+    renderSmart();
     $('lblFrom').textContent = x.from;
     $('lblTo').textContent = x.to;
     $('tipsTitle').textContent = x.tipsTitle;
@@ -160,6 +177,7 @@
     $('outEvery').textContent = continuous ? x.intervalContinuous : `${p.intervalSec} s`;
     $('fade').value = p.fadeMs;
     $('outFade').textContent = `${p.fadeMs} ms`;
+    renderSmart();
   }
 
   async function renderDevices() {
@@ -179,6 +197,32 @@
     // Don't rewrite the saved id: the device may simply be unplugged right now.
   }
 
+  function renderStartMode() {
+    $('startModeBox').hidden = !(S.autoStart && info.packaged);
+    for (const b of $('startMode').children) b.setAttribute('aria-checked', String(b.dataset.mode === S.startMode));
+  }
+
+  function renderSmart() {
+    const x = t();
+    const continuous = !(currentParams().intervalSec > 0);
+    $('smartOn').disabled = continuous;
+    $('smartSub').textContent = continuous ? x.smartSubContinuous : x.smartSub;
+    $('smartBox').hidden = !(S.smart.enabled && !continuous);
+    $('smartThr').value = S.smart.thresholdDb;
+    $('outThr').textContent = `${S.smart.thresholdDb} ${x.dB}`;
+    $('smartResume').value = S.smart.resumeSec;
+    $('outResume').textContent = `${S.smart.resumeSec} s`;
+    $('meterMark').style.left = `${Math.min(100, Math.max(0, ((S.smart.thresholdDb + 80) / 80) * 100))}%`;
+  }
+
+  function renderMeter() {
+    const lvl = state.level;
+    const pct = Number.isFinite(lvl) ? Math.min(100, Math.max(0, ((lvl + 80) / 80) * 100)) : 0;
+    $('meterFill').style.width = `${pct}%`;
+    $('meterOut').textContent = Number.isFinite(lvl) && lvl > -80 ? `${lvl.toFixed(0)} ${t().dB}` : t().meterSilent;
+    $('meterFill').parentElement.classList.toggle('hot', !!state.paused);
+  }
+
   function renderStatus() {
     const x = t();
     const on = !!state.running;
@@ -186,10 +230,11 @@
     btn.classList.toggle('on', on);
     btn.setAttribute('aria-pressed', String(on));
     btn.setAttribute('aria-label', on ? x.tapToStop : x.tapToStart);
-    $('statusTitle').textContent = !on ? x.statusOff : state.active === false ? x.statusOutside : x.statusOn;
+    $('statusTitle').textContent = !on ? x.statusOff : state.active === false ? x.statusOutside : state.paused ? x.statusPaused : x.statusOn;
     let sub = x.tapToStart;
     if (on) {
       if (!state.active) sub = x.statusOutside;
+      else if (state.paused) sub = x.pausedSub;
       else if (state.continuous) sub = x.continuousOn;
       else if (state.nextAt) {
         const s = Math.max(0, Math.ceil((state.nextAt - Date.now()) / 1000));
@@ -202,6 +247,7 @@
     let msg = '';
     if (on && state.ctxState === 'suspended') msg = x.ctxSuspended;
     else if (on && state.error === 'device') msg = x.deviceMissing;
+    else if (on && S.smart.enabled && state.smartError) msg = x.smartFailed;
     else if (state.sampleRate && state.sampleRate < 44100 && currentParams().freq > 16000) msg = x.nyquistWarn(state.sampleRate);
     warn.textContent = msg;
     warn.hidden = !msg;
@@ -212,6 +258,7 @@
     const prevPulses = state.pulses;
     state = s;
     renderStatus();
+    renderMeter();
     window.bridge.reportState({ running: s.running, mode: S.mode });
     if (s.pulses !== prevPulses && s.pulses > 0) {
       const btn = $('power');
@@ -284,7 +331,24 @@
     });
     navigator.mediaDevices.addEventListener('devicechange', renderDevices);
 
-    $('autoStart').addEventListener('change', (e) => { S.autoStart = e.target.checked; save(); });
+    $('autoStart').addEventListener('change', (e) => { S.autoStart = e.target.checked; save(); renderStartMode(); });
+    $('startMode').addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      S.startMode = b.dataset.mode;
+      save();
+      renderStartMode();
+    });
+    $('smartOn').addEventListener('change', (e) => {
+      S.smart.enabled = e.target.checked;
+      save(); renderSmart(); engine.update(config());
+    });
+    $('smartThr').addEventListener('input', (e) => {
+      S.smart.thresholdDb = Number(e.target.value); save(); renderSmart(); engine.update(config());
+    });
+    $('smartResume').addEventListener('input', (e) => {
+      S.smart.resumeSec = Number(e.target.value); save(); renderSmart(); engine.update(config());
+    });
     $('schedOn').addEventListener('change', (e) => {
       S.schedule.enabled = e.target.checked;
       $('schedRow').hidden = !S.schedule.enabled;
@@ -312,6 +376,7 @@
     window.bridge.setLang(S.lang);
     $('autoStart').checked = S.autoStart;
     $('autoStart').disabled = !info.packaged;
+    $('smartOn').checked = S.smart.enabled;
     $('schedOn').checked = S.schedule.enabled;
     $('schedRow').hidden = !S.schedule.enabled;
     $('schedFrom').value = S.schedule.from;

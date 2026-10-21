@@ -77,6 +77,29 @@
         <span><b id="autoStartLbl"></b><small id="autoStartSub" class="muted"></small></span>
         <input id="autoStart" type="checkbox" class="switch">
       </label>
+      <div id="startModeBox" class="seg-wrap" hidden>
+        <div class="seg" role="radiogroup" id="startMode">
+          <button type="button" role="radio" data-mode="tray" id="startTray"></button>
+          <button type="button" role="radio" data-mode="window" id="startWindow"></button>
+        </div>
+      </div>
+      <label class="switch-row">
+        <span><b id="smartLbl"></b><small id="smartSub" class="muted"></small></span>
+        <input id="smartOn" type="checkbox" class="switch">
+      </label>
+      <div id="smartBox" class="smart" hidden>
+        <div class="meter" aria-hidden="true"><div id="meterFill"></div><div id="meterMark"></div></div>
+        <div class="meter-info"><span id="meterLbl" class="muted"></span><output id="meterOut"></output></div>
+        <div class="field">
+          <label for="smartThr" id="lblThr"></label>
+          <div class="slider"><input id="smartThr" type="range" min="-80" max="-20" step="1"><output id="outThr"></output></div>
+        </div>
+        <div class="field">
+          <label for="smartResume" id="lblResume"></label>
+          <div class="slider"><input id="smartResume" type="range" min="3" max="120" step="1"><output id="outResume"></output></div>
+        </div>
+        <p id="smartNote" class="muted small-text"></p>
+      </div>
       <label class="switch-row">
         <span><b id="schedLbl"></b><small id="schedSub" class="muted"></small></span>
         <input id="schedOn" type="checkbox" class="switch">
@@ -104,6 +127,8 @@
   <script src="synth.js"></script>
   <script src="presets.js"></script>
   <script src="i18n.js"></script>
+  <script src="gate.js"></script>
+  <script src="monitor.js"></script>
   <script src="engine.js"></script>
   <script src="app.js"></script>
 </body>

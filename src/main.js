@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, shell } = require('electron');
+const { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, shell, session, desktopCapturer } = require('electron');
 const fs = require('fs');
 const path = require('path');
 
@@ -49,10 +49,11 @@ function showWindow() {
   win.focus();
 }
 
-function applyAutoStart(enabled) {
+function applyAutoStart(enabled, mode) {
   // Only meaningful for the installed build; in dev it would register electron.exe.
   if (!app.isPackaged) return;
-  app.setLoginItemSettings({ openAtLogin: !!enabled, args: ['--hidden'] });
+  // 'tray' = start hidden in the background, 'window' = open the window at login.
+  app.setLoginItemSettings({ openAtLogin: !!enabled, args: mode === 'window' ? [] : ['--hidden'] });
 }
 
 function refreshTray() {
@@ -105,7 +106,21 @@ function createWindow() {
 
 app.on('second-instance', showWindow);
 
+// "Pause while other audio plays" listens to the Windows output mix through Chromium's
+// loopback capture. Only our own local page may ask; the audio never leaves the renderer.
+function setupLoopbackCapture() {
+  session.defaultSession.setDisplayMediaRequestHandler((request, callback) => {
+    const frame = request.frame;
+    if (!frame || !frame.url.startsWith('file://')) return callback({});
+    desktopCapturer
+      .getSources({ types: ['screen'], thumbnailSize: { width: 0, height: 0 } })
+      .then((sources) => callback({ video: sources[0], audio: 'loopback' }))
+      .catch(() => callback({}));
+  });
+}
+
 app.whenReady().then(() => {
+  setupLoopbackCapture();
   createWindow();
 
   const trayImg = nativeImage.createFromPath(path.join(__dirname, '..', 'build', 'tray.png'));
@@ -116,7 +131,7 @@ app.whenReady().then(() => {
   ipcMain.handle('settings:load', () => loadSettings());
   ipcMain.on('settings:save', (_e, data) => {
     saveSettings(data);
-    applyAutoStart(data && data.autoStart);
+    applyAutoStart(data && data.autoStart, data && data.startMode);
   });
   ipcMain.on('engine:state', (_e, s) => {
     engineState = s;
