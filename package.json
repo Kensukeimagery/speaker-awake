@@ -1,7 +1,7 @@
 {
   "name": "speaker-awake",
   "productName": "Speaker Awake",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Keeps auto-sleep speakers (e.g. Microlab Solo 29) awake with inaudible pulses.",
   "main": "src/main.js",
   "author": "Speaker Awake contributors",

@@ -39,7 +39,18 @@
       recommended: false,
       params: { wave: 'sine', freq: 18000, gainDb: -36, durationMs: 500, intervalSec: 20, fadeMs: 60 },
     },
+    {
+      // Rotates through the other modes at random; params only supply a representative pulse.
+      id: 'shuffle',
+      icon: '⇄',
+      recommended: true,
+      shuffle: true,
+      params: { wave: 'sine', freq: 20000, gainDb: -32, durationMs: 600, intervalSec: 10, fadeMs: 80 },
+    },
   ];
+
+  const SHUFFLE_DEFAULTS = { pool: ['ultrasonic', 'subsonic', 'whisper', 'tick'], minSec: 5, maxSec: 20, jitterDb: 3 };
+  const SHUFFLE_LIMITS = { minSec: { min: 1, max: 120 }, maxSec: { min: 1, max: 120 }, jitterDb: { min: 0, max: 9 } };
 
   const LIMITS = {
     freq: { min: 20, max: 22000 },
@@ -55,7 +66,7 @@
     return MODES.find((m) => m.id === id) || MODES[0];
   }
 
-  const api = { MODES, LIMITS, WAVES, modeById };
+  const api = { MODES, LIMITS, WAVES, modeById, SHUFFLE_DEFAULTS, SHUFFLE_LIMITS };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Presets = api;
 })(typeof window !== 'undefined' ? window : globalThis);

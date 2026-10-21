@@ -24,7 +24,7 @@ Many desktop speakers (Microlab Solo series, Edifier, Logitech, Creative and oth
 
 It lives in your system tray and plays a tiny signal at a chosen interval, so the speaker's silence detector never sees "silence". The default is an **ultrasonic 20 kHz pulse** that most adults can't hear.
 
-- **6 modes** – ultrasonic pulse, deep hum, soft noise, tiny tick, always-on, custom
+- **7 modes** – ultrasonic pulse, deep hum, soft noise, tiny tick, always-on, custom, and **Shuffle**
 - **Fine-tune everything** – frequency, level (dB), pulse length, repeat interval, fade, per mode
 - **Pick the output device** – target just your speakers
 - **Schedule** – only run during chosen hours (overnight ranges work)
@@ -57,6 +57,7 @@ It lives in your system tray and plays a tiny signal at a chosen interval, so th
 | Tiny tick | 12 ms click | Lowest power, may be faintly audible |
 | Always on | Constant very quiet 20 kHz | Most reliable, slightly more power |
 | Custom | Your own recipe | Experimenting |
+| Shuffle | Rotates through the sounds you tick, at random times and slightly different levels | Speakers that fall asleep when the pattern never changes |
 
 ## Tuning for your speakers
 
@@ -66,6 +67,8 @@ A speaker's sleep timer can't be read, so settings are found by trial:
 2. Still sleeping? Shorten **Repeat every**, then raise **Level** by 3–6 dB.
 3. Still no luck? Try *Deep hum* or *Soft noise*, then *Always on*.
 4. Keep the Windows volume (and the app's volume in the mixer) above about 20 %: the pulse is scaled by it.
+
+**Falls asleep after a while?** Some speakers seem to stop trusting a fixed, repeating pattern. Try **Shuffle**: tick which sounds to mix, set the shortest and longest wait, and add some level variation. If it still sleeps, also check Windows' own power saving for the audio device (Sound settings → your device → Properties → turn off audio enhancements / power saving where offered) and report your speaker model with the issue form.
 
 Use **Audible beep** in the Fine-tune panel to confirm the right output device is selected.
 
@@ -139,7 +142,7 @@ Speaker reports are the most useful contribution – see [CONTRIBUTING.md](CONTR
 
 อยู่ที่ถาดระบบ (system tray) และส่งสัญญาณเสียงเล็กๆ เป็นช่วงๆ เพื่อไม่ให้ลำโพงเห็นว่า "เงียบ" ค่าเริ่มต้นคือ **พัลส์อัลตราโซนิก 20 kHz** ที่ผู้ใหญ่ส่วนใหญ่ไม่ได้ยิน
 
-- **6 โหมด** – พัลส์อัลตราโซนิก ฮัมทุ้มต่ำ นอยส์เบาๆ คลิกเล็กๆ เปิดตลอด กำหนดเอง
+- **7 โหมด** – พัลส์อัลตราโซนิก ฮัมทุ้มต่ำ นอยส์เบาๆ คลิกเล็กๆ เปิดตลอด กำหนดเอง และ **สลับสุ่ม**
 - **ปรับละเอียดได้ทุกอย่าง** – ความถี่ ระดับเสียง (dB) ความยาว ช่วงส่งซ้ำ การเฟด แยกตามโหมด
 - **เลือกอุปกรณ์เล่นเสียง** ให้ตรงกับลำโพง
 - **ตั้งเวลา** ทำงานเฉพาะบางช่วง (ข้ามคืนได้)
@@ -168,6 +171,7 @@ Speaker reports are the most useful contribution – see [CONTRIBUTING.md](CONTR
 - **คลิกเล็กๆ** – คลิก 12 มิลลิวินาที ประหยัดไฟที่สุด แต่อาจได้ยินเบาๆ
 - **เปิดตลอด** – สัญญาณเบามากต่อเนื่อง เชื่อถือได้ที่สุด กินไฟเพิ่มเล็กน้อย
 - **กำหนดเอง** – สูตรของคุณเอง
+- **สลับสุ่ม** – สลับไปมาระหว่างเสียงที่คุณติ๊กเลือก ที่เวลาและระดับเสียงสุ่ม สำหรับลำโพงที่หลับเมื่อรูปแบบเสียงไม่เคยเปลี่ยน
 
 ## วิธีหาค่าที่เหมาะกับลำโพงของคุณ
 
@@ -177,6 +181,8 @@ Speaker reports are the most useful contribution – see [CONTRIBUTING.md](CONTR
 2. ถ้ายังหลับ ลดค่า **ส่งซ้ำทุก** ให้สั้นลง แล้วเพิ่ม **ระดับเสียง** ทีละ 3–6 dB
 3. ถ้ายังไม่ได้ผล ลอง *ฮัมทุ้มต่ำ* หรือ *นอยส์เบาๆ* แล้วค่อยลอง *เปิดตลอด*
 4. อย่าตั้งเสียง Windows (และ Volume Mixer ของแอป) ต่ำกว่าประมาณ 20% เพราะสัญญาณจะเบาลงตาม
+
+**ใช้ไปสักพักแล้วลำโพงหลับ?** ลองโหมด **สลับสุ่ม** ติ๊กเลือกเสียงที่จะสลับ ตั้งเวลารอสั้นสุด/นานสุด และความแปรผันของระดับเสียง ถ้ายังหลับ ให้เช็กการประหยัดพลังงานของอุปกรณ์เสียงใน Windows ด้วย (ตั้งค่าเสียง → อุปกรณ์ของคุณ → คุณสมบัติ → ปิด audio enhancements/power saving ถ้ามี) และรายงานรุ่นลำโพงของคุณผ่านแบบฟอร์ม
 
 ปุ่ม **เสียงบี๊บทดสอบ** ช่วยเช็กว่าเลือกอุปกรณ์เล่นเสียงถูกตัว
 

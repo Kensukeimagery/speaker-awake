@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-  const { MODES, LIMITS, WAVES, modeById } = window.Presets;
+  const { MODES, LIMITS, WAVES, modeById, SHUFFLE_DEFAULTS, SHUFFLE_LIMITS } = window.Presets;
   const $ = (id) => document.getElementById(id);
 
   const DEFAULTS = {
@@ -13,6 +13,7 @@
     startMode: 'tray', // how to start with Windows: 'tray' (hidden) or 'window'
     schedule: { enabled: false, from: '22:00', to: '07:00' },
     smart: { enabled: false, thresholdDb: -55, resumeSec: 15 },
+    shuffle: JSON.parse(JSON.stringify(SHUFFLE_DEFAULTS)),
   };
 
   let S = JSON.parse(JSON.stringify(DEFAULTS));
@@ -27,8 +28,21 @@
   function currentParams() {
     return Object.assign({}, modeById(S.mode).params, S.params[S.mode] || {});
   }
+  function paramsFor(id) {
+    return Object.assign({}, modeById(id).params, S.params[id] || {});
+  }
+  // The modes shuffle can rotate through: pulse modes only (continuous has no pulses).
+  const shufflable = () => MODES.filter((m) => !m.shuffle && m.params.intervalSec > 0);
   function config() {
-    return { params: currentParams(), deviceId: S.deviceId, schedule: S.schedule, smart: S.smart };
+    const cfg = { params: currentParams(), deviceId: S.deviceId, schedule: S.schedule, smart: S.smart };
+    if (S.mode === 'shuffle') {
+      cfg.params = Object.assign({}, cfg.params, { intervalSec: S.shuffle.minSec });
+      cfg.shuffle = {
+        pool: S.shuffle.pool.map((id) => ({ id, params: paramsFor(id) })),
+        minSec: S.shuffle.minSec, maxSec: S.shuffle.maxSec, jitterDb: S.shuffle.jitterDb,
+      };
+    }
+    return cfg;
   }
   function save() {
     clearTimeout(saveTimer);
@@ -52,6 +66,18 @@
       out.smart.enabled = !!raw.smart.enabled;
       if (Number.isFinite(raw.smart.thresholdDb)) out.smart.thresholdDb = Math.min(-20, Math.max(-80, raw.smart.thresholdDb));
       if (Number.isFinite(raw.smart.resumeSec)) out.smart.resumeSec = Math.min(120, Math.max(3, raw.smart.resumeSec));
+    }
+    if (raw.shuffle && typeof raw.shuffle === 'object') {
+      const ok = shufflable().map((m) => m.id);
+      if (Array.isArray(raw.shuffle.pool)) {
+        const pool = raw.shuffle.pool.filter((id, i, a) => ok.includes(id) && a.indexOf(id) === i);
+        if (pool.length) out.shuffle.pool = pool;
+      }
+      for (const k of ['minSec', 'maxSec', 'jitterDb']) {
+        const v = raw.shuffle[k], lim = SHUFFLE_LIMITS[k];
+        if (Number.isFinite(v)) out.shuffle[k] = Math.min(lim.max, Math.max(lim.min, Math.round(v)));
+      }
+      if (out.shuffle.minSec > out.shuffle.maxSec) out.shuffle.maxSec = out.shuffle.minSec;
     }
     if (raw.params && typeof raw.params === 'object') {
       for (const m of MODES) {
@@ -97,6 +123,11 @@
     $('modeTitle').textContent = x.modeTitle;
     $('tuneTitle').textContent = x.tuneTitle;
     $('tuneHint').textContent = x.tuneHint;
+    $('lblPool').textContent = x.lblPool;
+    $('lblShMin').textContent = x.lblShMin;
+    $('lblShMax').textContent = x.lblShMax;
+    $('lblShJit').textContent = x.lblShJit;
+    $('shuffleHint').textContent = x.shuffleHint;
     $('lblWave').textContent = x.wave;
     $('lblFreq').textContent = x.freq;
     $('lblLevel').textContent = x.level;
@@ -144,7 +175,7 @@
       const [name, desc] = modeText(m.id);
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = 'mode';
+      b.className = m.shuffle ? 'mode wide' : 'mode';
       b.setAttribute('role', 'radio');
       b.setAttribute('aria-checked', String(m.id === S.mode));
       b.dataset.id = m.id;
@@ -152,14 +183,38 @@
       ico.setAttribute('aria-hidden', 'true');
       b.append(ico, Object.assign(document.createElement('b'), { textContent: name }),
         Object.assign(document.createElement('span'), { className: 'desc', textContent: desc }));
-      if (m.recommended) b.append(Object.assign(document.createElement('span'), { className: 'badge', textContent: t().recommended }));
+      if (m.recommended) b.append(Object.assign(document.createElement('span'), { className: 'badge', textContent: m.shuffle ? t().newBadge : t().recommended }));
       return b;
     }));
+  }
+
+  function renderShuffle() {
+    const x = t();
+    const sh = S.shuffle;
+    $('poolBox').replaceChildren(...shufflable().map((m) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip';
+      b.dataset.id = m.id;
+      b.textContent = modeText(m.id)[0];
+      b.setAttribute('aria-pressed', String(sh.pool.includes(m.id)));
+      return b;
+    }));
+    $('shMin').value = sh.minSec;
+    $('outShMin').textContent = `${sh.minSec} s`;
+    $('shMax').value = sh.maxSec;
+    $('outShMax').textContent = `${sh.maxSec} s`;
+    $('shJit').value = sh.jitterDb;
+    $('outShJit').textContent = sh.jitterDb ? `±${sh.jitterDb} ${x.dB}` : `0 ${x.dB}`;
   }
 
   function renderTune() {
     const p = currentParams();
     const x = t();
+    const isShuffle = S.mode === 'shuffle';
+    $('plainFields').hidden = isShuffle;
+    $('shufflePanel').hidden = !isShuffle;
+    if (isShuffle) renderShuffle();
     $('wave').value = p.wave;
     const noFreq = p.wave === 'white' || p.wave === 'pink';
     $('rowFreq').hidden = noFreq;
@@ -241,6 +296,7 @@
         sub = s === 0 ? x.playingNow : x.nextIn(s);
       }
       if (state.pulses && !state.continuous) sub += ` · ${x.pulsesSent(state.pulses)}`;
+      if (S.mode === 'shuffle' && state.lastKind && state.pulses) sub += ` · ${x.lastPulse}: ${modeText(state.lastKind)[0]}`;
     }
     $('statusSub').textContent = sub;
     const warn = $('warn');
@@ -315,10 +371,33 @@
     $('every').addEventListener('input', (e) => setParam({ intervalSec: Number(e.target.value) }));
     $('fade').addEventListener('input', (e) => setParam({ fadeMs: Number(e.target.value) }));
 
+    $('poolBox').addEventListener('click', (e) => {
+      const b = e.target.closest('.chip');
+      if (!b) return;
+      const id = b.dataset.id;
+      const pool = S.shuffle.pool;
+      if (pool.includes(id)) {
+        if (pool.length === 1) return; // keep at least one sound
+        S.shuffle.pool = pool.filter((x) => x !== id);
+      } else {
+        S.shuffle.pool = shufflable().map((m) => m.id).filter((x) => pool.includes(x) || x === id);
+      }
+      save(); renderShuffle(); engine.update(config());
+    });
+    const shSlider = (id, key) => $(id).addEventListener('input', (e) => {
+      S.shuffle[key] = Number(e.target.value);
+      if (S.shuffle.minSec > S.shuffle.maxSec) {
+        if (key === 'minSec') S.shuffle.maxSec = S.shuffle.minSec; else S.shuffle.minSec = S.shuffle.maxSec;
+      }
+      save(); renderShuffle(); engine.update(config());
+    });
+    shSlider('shMin', 'minSec'); shSlider('shMax', 'maxSec'); shSlider('shJit', 'jitterDb');
+
     $('testPulse').addEventListener('click', () => engine.testPulse(config()));
     $('testAudible').addEventListener('click', () => engine.testAudible(config()));
     $('resetMode').addEventListener('click', () => {
       delete S.params[S.mode];
+      if (S.mode === 'shuffle') S.shuffle = JSON.parse(JSON.stringify(SHUFFLE_DEFAULTS));
       save();
       renderTune();
       engine.update(config());

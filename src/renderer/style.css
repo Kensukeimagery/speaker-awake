@@ -87,6 +87,13 @@ p { margin: 0; }
 .mode .ico { font-size: 20px; color: var(--accent); line-height: 1; display: block; margin-bottom: 6px; }
 .mode b { display: block; font-size: 14px; }
 .mode span.desc { display: block; margin-top: 3px; font-size: 12px; color: var(--muted); line-height: 1.35; }
+.mode.wide { grid-column: 1 / -1; }
+.pool { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: inherit; font-size: 13px; color: var(--muted); background: var(--panel-2); border: 1px solid var(--line);
+  border-radius: 99px; padding: 5px 12px; cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
+.chip:hover { border-color: #3a4160; }
+.chip[aria-pressed="true"] { color: #04120e; background: var(--accent); border-color: var(--accent); font-weight: 600; }
+.chip:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
 .badge {
   position: absolute; top: 10px; right: 10px; font-size: 10.5px; padding: 1px 8px; border-radius: 99px;
   background: #36d6b522; color: var(--accent); border: 1px solid #36d6b544;
@@ -161,3 +168,5 @@ footer { display: flex; align-items: center; gap: 6px; }
 #meterMark { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--warn); left: 0; }
 .meter.hot #meterFill { background: var(--warn); }
 .meter-info { display: flex; justify-content: space-between; font-size: 12px; margin-top: 4px; }
+.chip::before { content: "○"; margin-right: 6px; opacity: .7; }
+.chip[aria-pressed="true"]::before { content: "✓"; opacity: 1; }

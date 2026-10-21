@@ -119,6 +119,7 @@
         running: this.running,
         active: this.active,
         paused: this.paused,
+        lastKind: this.lastKind || null,
         level: this.level,
         smartError: this.smartError,
         nextAt: this.nextAt,
@@ -171,16 +172,25 @@
           if (!this.active || this.nextAt === 0) this.nextAt = now; // fire at once when (re)activated
           this.active = true;
           if (now >= this.nextAt) {
-            this.playOnce(p);
+            const pick = this.nextPulse(p);
+            this.playOnce(pick.params);
             this.pulses++;
             this.lastAt = now;
-            this.nextAt = now + p.intervalSec * 1000;
+            this.lastKind = pick.id;
+            this.nextAt = now + pick.intervalSec * 1000;
           }
         }
       } catch (e) {
         this.error = String(e && e.message || e);
       }
       this.emit();
+    }
+
+    // Shuffle mode picks a different pulse (and wait) each time; other modes repeat their own.
+    nextPulse(p) {
+      const sh = this.cfg && this.cfg.shuffle;
+      const r = sh && root.Shuffle.next(sh.pool, this.lastKind, sh);
+      return r || { id: null, params: p, intervalSec: p.intervalSec };
     }
 
     async start(cfg) {
@@ -210,7 +220,7 @@
 
     async update(cfg) {
       const sinkChanged = !this.cfg || this.cfg.deviceId !== cfg.deviceId;
-      const paramsChanged = !this.cfg || JSON.stringify(this.cfg.params) !== JSON.stringify(cfg.params);
+      const paramsChanged = !this.cfg || JSON.stringify([this.cfg.params, this.cfg.shuffle]) !== JSON.stringify([cfg.params, cfg.shuffle]);
       this.cfg = cfg;
       if (sinkChanged) await this.applySink();
       if (paramsChanged) {
@@ -225,7 +235,7 @@
     async testPulse(cfg) {
       this.cfg = this.cfg || cfg;
       await this.ensureContext();
-      return this.playOnce(cfg.params);
+      return this.playOnce(this.nextPulse(cfg.params).params);
     }
 
     // Same envelope but at an audible 1 kHz, to confirm the right device is producing sound.

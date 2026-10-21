@@ -35,6 +35,7 @@
       <details id="tune">
         <summary><span id="tuneTitle"></span></summary>
         <p id="tuneHint" class="muted small-text"></p>
+        <div id="plainFields">
         <div class="field"><label for="wave" id="lblWave"></label><select id="wave"></select></div>
         <div class="field" id="rowFreq">
           <label for="freq" id="lblFreq"></label>
@@ -56,6 +57,23 @@
         <div class="field" id="rowFade">
           <label for="fade" id="lblFade"></label>
           <div class="slider"><input id="fade" type="range" min="0" max="500" step="10"><output id="outFade"></output></div>
+        </div>
+        </div>
+        <div id="shufflePanel" hidden>
+          <p id="shuffleHint" class="muted small-text"></p>
+          <div class="field"><label id="lblPool"></label><div id="poolBox" class="pool"></div></div>
+          <div class="field">
+            <label for="shMin" id="lblShMin"></label>
+            <div class="slider"><input id="shMin" type="range" min="1" max="120" step="1"><output id="outShMin"></output></div>
+          </div>
+          <div class="field">
+            <label for="shMax" id="lblShMax"></label>
+            <div class="slider"><input id="shMax" type="range" min="1" max="120" step="1"><output id="outShMax"></output></div>
+          </div>
+          <div class="field">
+            <label for="shJit" id="lblShJit"></label>
+            <div class="slider"><input id="shJit" type="range" min="0" max="9" step="1"><output id="outShJit"></output></div>
+          </div>
         </div>
         <div class="btnrow">
           <button id="testPulse" class="btn" type="button"></button>
@@ -127,6 +145,7 @@
   <script src="synth.js"></script>
   <script src="presets.js"></script>
   <script src="i18n.js"></script>
+  <script src="shuffle.js"></script>
   <script src="gate.js"></script>
   <script src="monitor.js"></script>
   <script src="engine.js"></script>
