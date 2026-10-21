@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:">
+  <title>Speaker Awake</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="titlebar">
+    <div class="brand"><span class="logo" aria-hidden="true"></span><span id="brandName">Speaker Awake</span></div>
+    <button id="langBtn" class="ghost small" type="button"></button>
+  </header>
+
+  <main>
+    <section class="hero" aria-live="polite">
+      <button id="power" class="power" type="button" aria-pressed="false">
+        <span class="ring r1"></span><span class="ring r2"></span>
+        <svg viewBox="0 0 24 24" width="44" height="44" aria-hidden="true">
+          <path d="M12 3v9" /><path d="M6.4 6.6a8 8 0 1 0 11.2 0" />
+        </svg>
+      </button>
+      <h1 id="statusTitle"></h1>
+      <p id="statusSub" class="muted"></p>
+      <p id="warn" class="warn" hidden></p>
+    </section>
+
+    <section>
+      <h2 id="modeTitle"></h2>
+      <div id="modes" class="modes" role="radiogroup"></div>
+    </section>
+
+    <section class="card">
+      <details id="tune">
+        <summary><span id="tuneTitle"></span></summary>
+        <p id="tuneHint" class="muted small-text"></p>
+        <div class="field"><label for="wave" id="lblWave"></label><select id="wave"></select></div>
+        <div class="field" id="rowFreq">
+          <label for="freq" id="lblFreq"></label>
+          <div class="slider"><input id="freq" type="range" min="0" max="1000" step="1"><output id="outFreq"></output></div>
+          <small id="freqNote" class="muted"></small>
+        </div>
+        <div class="field">
+          <label for="gain" id="lblLevel"></label>
+          <div class="slider"><input id="gain" type="range" min="-70" max="-6" step="1"><output id="outGain"></output></div>
+        </div>
+        <div class="field" id="rowLen">
+          <label for="len" id="lblLen"></label>
+          <div class="slider"><input id="len" type="range" min="50" max="3000" step="50"><output id="outLen"></output></div>
+        </div>
+        <div class="field">
+          <label for="every" id="lblEvery"></label>
+          <div class="slider"><input id="every" type="range" min="0" max="120" step="1"><output id="outEvery"></output></div>
+        </div>
+        <div class="field" id="rowFade">
+          <label for="fade" id="lblFade"></label>
+          <div class="slider"><input id="fade" type="range" min="0" max="500" step="10"><output id="outFade"></output></div>
+        </div>
+        <div class="btnrow">
+          <button id="testPulse" class="btn" type="button"></button>
+          <button id="testAudible" class="btn" type="button"></button>
+          <button id="resetMode" class="btn ghost" type="button"></button>
+        </div>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2 id="outputTitle"></h2>
+      <select id="device" aria-labelledby="outputTitle"></select>
+      <p id="deviceHint" class="muted small-text"></p>
+    </section>
+
+    <section class="card">
+      <h2 id="optionsTitle"></h2>
+      <label class="switch-row">
+        <span><b id="autoStartLbl"></b><small id="autoStartSub" class="muted"></small></span>
+        <input id="autoStart" type="checkbox" class="switch">
+      </label>
+      <label class="switch-row">
+        <span><b id="schedLbl"></b><small id="schedSub" class="muted"></small></span>
+        <input id="schedOn" type="checkbox" class="switch">
+      </label>
+      <div id="schedRow" class="sched" hidden>
+        <span id="lblFrom"></span><input id="schedFrom" type="time">
+        <span id="lblTo"></span><input id="schedTo" type="time">
+      </div>
+    </section>
+
+    <section class="card tips">
+      <h2 id="tipsTitle"></h2>
+      <ul id="tipsList"></ul>
+    </section>
+
+    <footer>
+      <span id="ver" class="muted"></span>
+      <span class="grow"></span>
+      <button id="ghLink" class="ghost small" type="button">GitHub</button>
+      <button id="quitBtn" class="ghost small danger" type="button"></button>
+    </footer>
+    <p id="quitTip" class="muted small-text center"></p>
+  </main>
+
+  <script src="synth.js"></script>
+  <script src="presets.js"></script>
+  <script src="i18n.js"></script>
+  <script src="engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

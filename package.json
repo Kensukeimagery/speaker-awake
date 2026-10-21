@@ -1,0 +1,56 @@
+{
+  "name": "speaker-awake",
+  "productName": "Speaker Awake",
+  "version": "1.0.0",
+  "description": "Keeps auto-sleep speakers (e.g. Microlab Solo 29) awake with inaudible pulses.",
+  "main": "src/main.js",
+  "author": "Speaker Awake contributors",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test \"test/*.test.js\"",
+    "dist": "electron-builder --win nsis",
+    "icons": "python build/make_icons.py"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "rcedit": "^4.0.1"
+  },
+  "build": {
+    "appId": "com.speakerawake.app",
+    "productName": "Speaker Awake",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "build/tray.png",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "SpeakerAwake-Setup-${version}.${ext}",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Speaker Awake",
+      "runAfterFinish": true,
+      "include": "build/installer.nsh"
+    },
+    "afterPack": "build/after-pack.js"
+  }
+}
