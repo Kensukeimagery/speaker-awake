@@ -1,0 +1,38 @@
+name: Speaker compatibility report
+description: Tell us which speaker you use and which settings kept it awake (or didn't).
+title: "[Speaker] <brand + model>"
+labels: ["compatibility"]
+body:
+  - type: input
+    id: model
+    attributes:
+      label: Speaker brand and model
+      placeholder: Microlab Solo 29
+    validations: { required: true }
+  - type: dropdown
+    id: connection
+    attributes:
+      label: How is it connected?
+      options: ["3.5 mm jack", "USB", "Optical / S/PDIF", "Bluetooth", "HDMI / monitor", "Other"]
+    validations: { required: true }
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result
+      options: ["Works – stays awake", "Partly – still sleeps sometimes", "Does not work"]
+    validations: { required: true }
+  - type: textarea
+    id: settings
+    attributes:
+      label: Mode and settings
+      description: Mode, frequency, level (dB), repeat interval, pulse length.
+      placeholder: "Ultrasonic pulse, 20 kHz, -32 dB, every 15 s, 0.6 s"
+    validations: { required: true }
+  - type: input
+    id: sleep
+    attributes:
+      label: How long until the speaker sleeps without the app? (if known)
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else

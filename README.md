@@ -1,16 +1,50 @@
+<div align="center">
+
+<img src="docs/img/banner.png" alt="Speaker Awake – keep your speakers from falling asleep" width="100%">
+
 # Speaker Awake
 
-**EN** · [ภาษาไทย](#ภาษาไทย)
+**Stop auto-standby speakers from falling asleep, so you never miss the first ring of a call.**<br>
+Built for the **Microlab Solo 29**, works with any speaker that goes to sleep when it's quiet.
 
-Stops auto-sleep speakers (made for the **Microlab Solo 29**, works with others) from going to sleep, so you don't miss the first ring of a call. It sits in the system tray and sends tiny, inaudible signals to your speakers at a chosen interval.
+[![Download](https://img.shields.io/github/v/release/Kensukeimagery/speaker-awake?label=Download&style=for-the-badge&color=36d6b5&labelColor=0e1016)](https://github.com/Kensukeimagery/speaker-awake/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/Kensukeimagery/speaker-awake/total?style=for-the-badge&color=6c8cff&labelColor=0e1016)](https://github.com/Kensukeimagery/speaker-awake/releases)
+[![License: MIT](https://img.shields.io/github/license/Kensukeimagery/speaker-awake?style=for-the-badge&labelColor=0e1016)](LICENSE)
+![Windows 10/11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=for-the-badge&labelColor=0e1016)
+
+**English** · [ภาษาไทย](#ภาษาไทย)
+
+</div>
+
+## The problem
+
+Many desktop speakers (Microlab Solo series, Edifier, Logitech, Creative and others) switch to standby after a few minutes of silence. When a call comes in, the speaker needs a moment to wake up and **the first ring is lost** – or you miss the call completely.
+
+## What Speaker Awake does
+
+It lives in your system tray and plays a tiny signal at a chosen interval, so the speaker's silence detector never sees "silence". The default is an **ultrasonic 20 kHz pulse** that most adults can't hear.
+
+- **6 modes** – ultrasonic pulse, deep hum, soft noise, tiny tick, always-on, custom
+- **Fine-tune everything** – frequency, level (dB), pulse length, repeat interval, fade, per mode
+- **Pick the output device** – target just your speakers
+- **Schedule** – only run during chosen hours (overnight ranges work)
+- **Starts with Windows**, hidden in the tray
+- **Thai / English interface**
+- Free, open source, no account, no network access, no telemetry
+
+<div align="center">
+<img src="docs/img/main-en.png" alt="Main window" width="300">
+&nbsp;&nbsp;
+<img src="docs/img/tune-en.png" alt="Fine-tune panel" width="300">
+</div>
 
 ## Install
 
-1. Download `SpeakerAwake-Setup-x.y.z.exe` from [Releases](../../releases/latest).
+1. Download **`SpeakerAwake-Setup-x.y.z.exe`** from the [latest release](https://github.com/Kensukeimagery/speaker-awake/releases/latest).
 2. Run it (Windows 10/11, 64-bit). It installs per-user, no admin rights needed.
-3. Pick a mode, press the big button. Closing the window keeps it running in the tray.
+3. Pick a mode and press the big button. Closing the window keeps it running in the tray.
 
-> Windows SmartScreen may warn because the installer isn't code-signed. Choose **More info → Run anyway**, or build it yourself (below).
+> Windows SmartScreen may warn because the installer isn't code-signed. Choose **More info → Run anyway**, or [build it yourself](#build-from-source).
 
 ## Modes
 
@@ -23,24 +57,42 @@ Stops auto-sleep speakers (made for the **Microlab Solo 29**, works with others)
 | Always on | Constant very quiet 20 kHz | Most reliable, slightly more power |
 | Custom | Your own recipe | Experimenting |
 
-Under **Fine-tune** you can change sound type, frequency, level (dB), pulse length, repeat interval and fade, per mode. **Test this mode** plays one pulse; **Audible beep** plays a 1 kHz beep so you can confirm the right output device.
-
-Other options: choose the output device, start with Windows (hidden in the tray), and an "only during these hours" schedule (overnight ranges work).
-
 ## Tuning for your speakers
 
-There is no way to read a speaker's sleep timer, so settings are found by trial:
+A speaker's sleep timer can't be read, so settings are found by trial:
 
-1. Start with *Ultrasonic pulse*. Let the speakers go quiet for longer than their sleep delay and see if they still sleep.
+1. Start with *Ultrasonic pulse*. Let the speakers sit idle longer than their sleep delay and see if they still sleep.
 2. Still sleeping? Shorten **Repeat every**, then raise **Level** by 3–6 dB.
 3. Still no luck? Try *Deep hum* or *Soft noise*, then *Always on*.
 4. Keep the Windows volume (and the app's volume in the mixer) above about 20 %: the pulse is scaled by it.
 
-Notes: the pulse is real audio, so very sensitive speakers may emit a faint hiss. Pets can hear 20 kHz. Frequencies near 20 kHz need the sound card at 44.1 kHz or higher (the app warns you otherwise).
+Use **Audible beep** in the Fine-tune panel to confirm the right output device is selected.
+
+## Tested speakers
+
+Help fill this in with a [speaker report](https://github.com/Kensukeimagery/speaker-awake/issues/new?template=speaker-report.yml).
+
+| Speaker | Connection | Mode & settings | Result |
+|---|---|---|---|
+| Microlab Solo 29 | 3.5 mm | Ultrasonic 20 kHz, −32 dB, 15 s *(default)* | ⏳ awaiting confirmation |
+
+## FAQ
+
+**Will I hear it?** The default 20 kHz pulse is above most adults' hearing range. Very sensitive speakers may emit a faint hiss; lower the level or use another mode. Pets can hear 20 kHz.
+
+**Does it use a lot of CPU or power?** No. It plays a short buffer every few seconds. Always-on mode keeps the audio device active and uses slightly more power.
+
+**My speaker still goes to sleep.** See [Tuning](#tuning-for-your-speakers). Some speakers only respond to audible-range signals; try *Soft noise*.
+
+**Does it work with Bluetooth / USB / HDMI speakers?** Any output Windows can play to. Pick it under *Output device*. Devices that sleep inside the digital link (some HDMI monitors) may behave differently, so please report results.
+
+**Does it stop the PC from sleeping?** No. It only keeps the *speakers* awake.
+
+**Is it safe?** Source code is here, MIT licensed. The app makes no network connections; the GitHub button just opens your browser.
 
 ## Build from source
 
-Needs Node.js 20+ (and Python + Pillow only to regenerate icons).
+Needs Node.js 20+ (Python + Pillow only to regenerate icons/banner).
 
 ```bash
 npm install
@@ -51,25 +103,58 @@ npm run dist    # builds dist/SpeakerAwake-Setup-<version>.exe
 
 Tip: building the installer from a very deep folder path can fail inside NSIS. Use a short path such as `C:\dev\speaker-awake`.
 
-To publish a release: `git tag v1.0.0 && git push --tags`. The workflow in `.github/workflows/release.yml` builds the installer and attaches it to the release.
+Release: `git tag v1.x.y && git push --tags`. The workflow in `.github/workflows/release.yml` builds the installer and attaches it to a GitHub release.
+
+## Contributing
+
+Speaker reports are the most useful contribution – see [CONTRIBUTING.md](CONTRIBUTING.md). If this saved you a missed call, a ⭐ helps other people find it.
 
 ## License
 
-MIT
+[MIT](LICENSE)
+
+<sub>Keywords: Microlab Solo 29 sleep, speaker auto standby, speaker auto power off, keep speakers awake, stop speaker going to sleep, speaker misses first ring, anti-sleep speaker Windows, ultrasonic keep-alive.</sub>
 
 ---
 
+<a id="ภาษาไทย"></a>
+
 # ภาษาไทย
 
-โปรแกรมกันลำโพงที่มีระบบ auto-sleep (ทำมาสำหรับ **Microlab Solo 29** แต่ใช้กับรุ่นอื่นได้) ไม่ให้เข้าสู่โหมดหลับ จะได้ไม่พลาดสายโทรเข้า โปรแกรมอยู่ที่ถาดระบบ (system tray) และส่งสัญญาณเสียงเบามากที่ไม่ได้ยินไปยังลำโพงเป็นช่วงๆ
+<div align="center">
+
+**กันลำโพงไม่ให้หลับ จะได้ไม่พลาดสายโทรเข้า**<br>
+ทำมาสำหรับ **Microlab Solo 29** ใช้ได้กับลำโพงทุกรุ่นที่เข้าโหมดหลับเองเมื่อเงียบ
+
+</div>
+
+## ปัญหา
+
+ลำโพงตั้งโต๊ะหลายรุ่น (Microlab Solo, Edifier, Logitech, Creative ฯลฯ) จะเข้าโหมดสแตนด์บายเมื่อเงียบไปสักพัก พอมีสายเข้า ลำโพงต้องใช้เวลาตื่น **เสียงเรียกแรกจึงหายไป** หรือพลาดสายไปเลย
+
+## โปรแกรมทำอะไร
+
+อยู่ที่ถาดระบบ (system tray) และส่งสัญญาณเสียงเล็กๆ เป็นช่วงๆ เพื่อไม่ให้ลำโพงเห็นว่า "เงียบ" ค่าเริ่มต้นคือ **พัลส์อัลตราโซนิก 20 kHz** ที่ผู้ใหญ่ส่วนใหญ่ไม่ได้ยิน
+
+- **6 โหมด** – พัลส์อัลตราโซนิก ฮัมทุ้มต่ำ นอยส์เบาๆ คลิกเล็กๆ เปิดตลอด กำหนดเอง
+- **ปรับละเอียดได้ทุกอย่าง** – ความถี่ ระดับเสียง (dB) ความยาว ช่วงส่งซ้ำ การเฟด แยกตามโหมด
+- **เลือกอุปกรณ์เล่นเสียง** ให้ตรงกับลำโพง
+- **ตั้งเวลา** ทำงานเฉพาะบางช่วง (ข้ามคืนได้)
+- **เริ่มพร้อม Windows** แบบซ่อนไว้ที่ถาดระบบ
+- หน้าต่างภาษาไทย/อังกฤษ
+- ฟรี โอเพนซอร์ส ไม่ต้องสมัครบัญชี ไม่เชื่อมต่ออินเทอร์เน็ต ไม่เก็บข้อมูล
+
+<div align="center">
+<img src="docs/img/main-th.png" alt="หน้าต่างหลัก" width="300">
+</div>
 
 ## ติดตั้ง
 
-1. ดาวน์โหลด `SpeakerAwake-Setup-x.y.z.exe` จากหน้า [Releases](../../releases/latest)
+1. ดาวน์โหลด **`SpeakerAwake-Setup-x.y.z.exe`** จาก[หน้า Releases ล่าสุด](https://github.com/Kensukeimagery/speaker-awake/releases/latest)
 2. ดับเบิลคลิกเพื่อติดตั้ง (Windows 10/11 แบบ 64 บิต ไม่ต้องใช้สิทธิ์ผู้ดูแลระบบ)
 3. เลือกโหมด แล้วกดปุ่มกลมใหญ่ ปิดหน้าต่างแล้วโปรแกรมยังทำงานต่อที่ถาดระบบ
 
-> Windows SmartScreen อาจเตือน เพราะตัวติดตั้งยังไม่ได้เซ็นรับรอง กด **ข้อมูลเพิ่มเติม → เรียกใช้อยู่ดี** หรือสร้างจากซอร์สโค้ดเอง (ดูด้านบน)
+> Windows SmartScreen อาจเตือน เพราะตัวติดตั้งยังไม่ได้เซ็นรับรอง กด **ข้อมูลเพิ่มเติม → เรียกใช้อยู่ดี** หรือสร้างจากซอร์สโค้ดเอง
 
 ## โหมด
 
@@ -80,10 +165,6 @@ MIT
 - **เปิดตลอด** – สัญญาณเบามากต่อเนื่อง เชื่อถือได้ที่สุด กินไฟเพิ่มเล็กน้อย
 - **กำหนดเอง** – สูตรของคุณเอง
 
-ในส่วน **ปรับแต่งละเอียด** ปรับชนิดเสียง ความถี่ ระดับ (dB) ความยาว ช่วงเวลาส่งซ้ำ และการเฟดได้แยกตามโหมด ปุ่ม **ทดสอบโหมดนี้** เล่นหนึ่งครั้ง ส่วน **เสียงบี๊บทดสอบ** เล่นเสียง 1 kHz ให้ได้ยินจริงเพื่อเช็กว่าเลือกอุปกรณ์ถูกตัว
-
-ตัวเลือกอื่น: เลือกอุปกรณ์เล่นเสียง เริ่มพร้อม Windows (ซ่อนไว้ที่ถาดระบบ) และตั้งเวลาทำงานเฉพาะบางช่วง (ข้ามคืนได้)
-
 ## วิธีหาค่าที่เหมาะกับลำโพงของคุณ
 
 โปรแกรมอ่านเวลา sleep ของลำโพงไม่ได้ จึงต้องลองปรับดู:
@@ -93,7 +174,17 @@ MIT
 3. ถ้ายังไม่ได้ผล ลอง *ฮัมทุ้มต่ำ* หรือ *นอยส์เบาๆ* แล้วค่อยลอง *เปิดตลอด*
 4. อย่าตั้งเสียง Windows (และ Volume Mixer ของแอป) ต่ำกว่าประมาณ 20% เพราะสัญญาณจะเบาลงตาม
 
-หมายเหตุ: สัญญาณเป็นเสียงจริง ลำโพงที่ไวมากอาจมีเสียงซ่าเบาๆ สัตว์เลี้ยงอาจได้ยิน 20 kHz และความถี่ใกล้ 20 kHz ต้องใช้การ์ดเสียงที่ 44.1 kHz ขึ้นไป (โปรแกรมจะเตือนถ้าไม่ถึง)
+ปุ่ม **เสียงบี๊บทดสอบ** ช่วยเช็กว่าเลือกอุปกรณ์เล่นเสียงถูกตัว
+
+## คำถามที่พบบ่อย
+
+**จะได้ยินเสียงไหม?** พัลส์ 20 kHz สูงกว่าช่วงที่ผู้ใหญ่ส่วนใหญ่ได้ยิน ลำโพงที่ไวมากอาจมีเสียงซ่าเบาๆ ให้ลดระดับเสียงหรือเปลี่ยนโหมด สัตว์เลี้ยงอาจได้ยิน
+
+**กินไฟหรือ CPU มากไหม?** ไม่มาก โหมดเปิดตลอดจะกินไฟมากขึ้นเล็กน้อย
+
+**ใช้กับลำโพง USB / Bluetooth / HDMI ได้ไหม?** ได้กับเอาต์พุตที่ Windows เล่นเสียงออกได้ เลือกใน "อุปกรณ์เล่นเสียง" ถ้าใช้ได้หรือไม่ได้ บอกเราผ่าน[แบบฟอร์มรายงานลำโพง](https://github.com/Kensukeimagery/speaker-awake/issues/new?template=speaker-report.yml)
+
+**ทำให้คอมไม่หลับด้วยไหม?** ไม่ กันเฉพาะ *ลำโพง* ไม่ให้หลับ
 
 ## สร้างจากซอร์สโค้ด
 
@@ -110,4 +201,6 @@ npm run dist
 
 ## สัญญาอนุญาต
 
-MIT
+[MIT](LICENSE)
+
+<sub>คำค้นหา: Microlab Solo 29 ลำโพงหลับ, ลำโพงดับเอง, ลำโพงสแตนด์บาย, กันลำโพงหลับ, ลำโพงไม่ดังตอนสายเข้า, ลำโพง auto sleep</sub>

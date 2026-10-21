@@ -9,7 +9,7 @@
   "scripts": {
     "start": "electron .",
     "test": "node --test \"test/*.test.js\"",
-    "dist": "electron-builder --win nsis",
+    "dist": "electron-builder --win nsis --publish never",
     "icons": "python build/make_icons.py"
   },
   "devDependencies": {
@@ -52,5 +52,27 @@
       "include": "build/installer.nsh"
     },
     "afterPack": "build/after-pack.js"
-  }
+  },
+  "homepage": "https://github.com/Kensukeimagery/speaker-awake#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kensukeimagery/speaker-awake.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Kensukeimagery/speaker-awake/issues"
+  },
+  "keywords": [
+    "speaker",
+    "microlab",
+    "solo29",
+    "keep-awake",
+    "auto-standby",
+    "auto-sleep",
+    "anti-sleep",
+    "windows",
+    "tray",
+    "electron",
+    "ultrasonic",
+    "audio"
+  ]
 }
