@@ -20,6 +20,9 @@
   let info = { version: '', packaged: false };
   let state = {};
   let saveTimer = null;
+  let uiVisible = false; // is anyone looking? Drawing is skipped while the window is hidden in the tray
+  let uiTimer = null;
+  let lastReported = '';
 
   const t = () => window.I18N[S.lang];
   const modeText = (id) => window.I18N.modes[S.lang][id];
@@ -165,7 +168,7 @@
     wave.replaceChildren(...WAVES.map((w) => Object.assign(document.createElement('option'), { value: w, textContent: x.waves[w] })));
     renderModes();
     renderTune();
-    renderDevices();
+    if (uiVisible) renderDevices();
     renderStatus();
   }
 
@@ -313,15 +316,32 @@
   const engine = new window.AwakeEngine.Engine((s) => {
     const prevPulses = state.pulses;
     state = s;
+    // The tray only needs to hear about running/paused, and only when it changes.
+    const key = String(!!s.running);
+    if (key !== lastReported) { lastReported = key; window.bridge.reportState({ running: !!s.running }); }
+    if (!uiVisible) return;
     renderStatus();
     renderMeter();
-    window.bridge.reportState({ running: s.running, mode: S.mode });
     if (s.pulses !== prevPulses && s.pulses > 0) {
       const btn = $('power');
       btn.classList.add('pulse');
       setTimeout(() => btn.classList.remove('pulse'), 400);
     }
   });
+
+  // While the window is visible, refresh the countdown and meter twice a second; otherwise do nothing.
+  function setUiVisible(v) {
+    uiVisible = v;
+    document.body.classList.toggle('ui-hidden', !v);
+    clearInterval(uiTimer);
+    uiTimer = null;
+    if (!v) return;
+    state = engine.snapshot();
+    renderStatus();
+    renderMeter();
+    renderDevices();
+    uiTimer = setInterval(() => { state = engine.snapshot(); renderStatus(); renderMeter(); }, 500);
+  }
 
   async function setRunning(on) {
     S.running = on;
@@ -334,6 +354,8 @@
   function bind() {
     $('power').addEventListener('click', () => setRunning(!state.running));
     window.bridge.onToggleRunning(() => setRunning(!state.running));
+    window.bridge.onVisibility(setUiVisible);
+    window.bridge.onResume(() => engine.tick());
 
     $('langBtn').addEventListener('click', () => {
       S.lang = S.lang === 'th' ? 'en' : 'th';
@@ -408,7 +430,7 @@
       save();
       engine.update(config());
     });
-    navigator.mediaDevices.addEventListener('devicechange', renderDevices);
+    navigator.mediaDevices.addEventListener('devicechange', () => { if (uiVisible) renderDevices(); });
 
     $('autoStart').addEventListener('change', (e) => { S.autoStart = e.target.checked; save(); renderStartMode(); });
     $('startMode').addEventListener('click', (e) => {
@@ -444,8 +466,6 @@
     $('ghLink').addEventListener('click', () => window.bridge.openExternal('https://github.com/Kensukeimagery/speaker-awake'));
     $('quitBtn').addEventListener('click', () => window.bridge.quit());
 
-    // Re-render the countdown once a second.
-    setInterval(renderStatus, 500);
   }
 
   async function init() {
@@ -462,6 +482,7 @@
     $('schedTo').value = S.schedule.to;
     bind();
     renderStatic();
+    setUiVisible(await window.bridge.isVisible());
     window.bridge.saveSettings(S); // registers auto-start on first run
     if (S.running) await engine.start(config());
     else { engine.stop(); }

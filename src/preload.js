@@ -8,5 +8,8 @@ contextBridge.exposeInMainWorld('bridge', {
   appInfo: () => ipcRenderer.invoke('app:info'),
   quit: () => ipcRenderer.send('app:quit'),
   openExternal: (url) => ipcRenderer.send('app:open-external', url),
+  isVisible: () => ipcRenderer.invoke('ui:visible'),
+  onResume: (cb) => ipcRenderer.on('power-resume', () => cb()),
+  onVisibility: (cb) => ipcRenderer.on('ui-visible', (_e, v) => cb(!!v)),
   onToggleRunning: (cb) => ipcRenderer.on('toggle-running', () => cb()),
 });

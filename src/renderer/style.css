@@ -170,3 +170,6 @@ footer { display: flex; align-items: center; gap: 6px; }
 .meter-info { display: flex; justify-content: space-between; font-size: 12px; margin-top: 4px; }
 .chip::before { content: "○"; margin-right: 6px; opacity: .7; }
 .chip[aria-pressed="true"]::before { content: "✓"; opacity: 1; }
+
+/* Nobody is looking: stop all animation work (the page keeps running to drive the audio). */
+.ui-hidden *, .ui-hidden *::before, .ui-hidden *::after { animation: none !important; transition: none !important; }

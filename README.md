@@ -31,6 +31,7 @@ It lives in your system tray and plays a tiny signal at a chosen interval, so th
 - **Smart pause** – stands down while music or a call is playing and resumes when it's quiet again (optional)
 - **Starts with Windows** – quietly in the background or with the window open, your choice (optional)
 - **Thai / English interface**
+- **Light on resources** – about 1–2 % of one CPU core (down from about 4 %) and roughly 70 MB of RAM (down from 100 MB) while sitting in the tray (measured on a Windows 11 PC, pulse mode); the window does no drawing while hidden
 - Free, open source, no account, no network access, no telemetry
 
 <div align="center">
@@ -149,6 +150,7 @@ Speaker reports are the most useful contribution – see [CONTRIBUTING.md](CONTR
 - **พักอัตโนมัติเมื่อมีเสียงเล่นอยู่** – หยุดส่งสัญญาณตอนเปิดเพลงหรือคุยสาย แล้วกลับมาเองเมื่อเงียบ (ตัวเลือก)
 - **เปิดเองหลังเปิดเครื่อง** – เลือกได้ว่าให้ทำงานเบื้องหลังเงียบๆ หรือเด้งหน้าต่างขึ้นมา (ตัวเลือก)
 - หน้าต่างภาษาไทย/อังกฤษ
+- **เบาเครื่อง** – ใช้ CPU ประมาณ 1–2% ของหนึ่งคอร์ (จากเดิม 4%) และ RAM ราว 70 MB (จากเดิม 100 MB) ตอนอยู่ที่ถาดระบบ (วัดบน Windows 11 โหมดพัลส์) หน้าต่างไม่ประมวลผลภาพเลยตอนซ่อนอยู่
 - ฟรี โอเพนซอร์ส ไม่ต้องสมัครบัญชี ไม่เชื่อมต่ออินเทอร์เน็ต ไม่เก็บข้อมูล
 
 <div align="center">

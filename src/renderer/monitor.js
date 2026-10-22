@@ -12,6 +12,8 @@
       this.buf = null;
       this.timer = null;
       this.isMasked = () => false;
+      this.onBusyChange = () => {};
+      this.lastBusy = false;
       this.error = '';
     }
 
@@ -26,10 +28,10 @@
         this.stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
         this.stream.getVideoTracks().forEach((t) => t.stop());
         if (!this.stream.getAudioTracks().length) throw new Error('no audio track');
-        this.ctx = new AudioContext();
+        this.ctx = new AudioContext({ latencyHint: 'playback' });
         const src = this.ctx.createMediaStreamSource(new MediaStream(this.stream.getAudioTracks()));
         this.analyser = this.ctx.createAnalyser();
-        this.analyser.fftSize = 2048;
+        this.analyser.fftSize = 16384; // ~340 ms of audio: longer than the 250 ms sample period, so nothing slips between samples
         const mute = this.ctx.createGain(); // keeps the graph pulled without making a sound
         mute.gain.value = 0;
         src.connect(this.analyser);
@@ -37,7 +39,7 @@
         mute.connect(this.ctx.destination);
         this.buf = new Float32Array(this.analyser.fftSize);
         this.error = '';
-        this.timer = setInterval(() => this.sample(), 200);
+        this.timer = setInterval(() => this.sample(), 250);
         return true;
       } catch (e) {
         this.error = String((e && e.message) || e);
@@ -52,7 +54,9 @@
       const now = Date.now();
       const db = root.Gate.rmsDb(this.buf);
       this.gate.feed(db, now, this.isMasked(now));
-      this.onLevel(this.gate.level, this.gate.busy(now));
+      this.onLevel(this.gate.level);
+      const busy = this.gate.busy(now);
+      if (busy !== this.lastBusy) { this.lastBusy = busy; this.onBusyChange(busy); }
     }
 
     busy(now) { return this.gate.busy(now); }
@@ -65,6 +69,7 @@
       if (this.ctx) this.ctx.close().catch(() => {});
       this.ctx = null;
       this.analyser = null;
+      this.lastBusy = false;
       this.gate.reset();
     }
   }
